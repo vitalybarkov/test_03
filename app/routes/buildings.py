@@ -24,6 +24,7 @@ def get_buildings(
         db_buildings = db.query(models.Building).offset(skip).limit(limit).all()
         if not db_buildings:
             raise HTTPException(status_code = 404, detail = f"no one building was not found")
+        #
         return db_buildings
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -38,6 +39,7 @@ def get_building(
         db_building = db.query(models.Building).filter(models.Building.id == id).first()
         if not db_building:
             raise HTTPException(status_code = 404, detail = f"building {id} not found")
+        #
         return db_building
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -53,6 +55,7 @@ def create_building(
         db.add(db_building)
         db.commit()
         db.refresh(db_building)
+        #
         return db_building
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -73,6 +76,7 @@ def update_building(
             setattr(db_building, key, value)
         db.commit()
         db.refresh(db_building)
+        #
         return db_building
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -89,6 +93,7 @@ def delete_building(
             raise HTTPException(status_code = Status.HTTP_404_NOT_FOUND, detail=f"Building with ID {id} not found")
         db.delete(db_building)
         db.commit()
+        #
         return None
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))

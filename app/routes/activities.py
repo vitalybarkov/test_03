@@ -24,6 +24,7 @@ def get_activities(
         activities = db.query(models.Activity).offset(skip).limit(limit).all()
         if not activities:
             raise HTTPException(status_code = 404, detail = f"no one activities was not found")
+        #
         return activities
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -38,6 +39,7 @@ def get_activity(
         db_activity = db.query(models.Activity).filter(models.Activity.id == id).first()
         if db_activity is None:
             raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"activity {id} not found")
+        #
         return db_activity
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -59,6 +61,7 @@ def get_activity_tree(
             db.refresh(db_activity)
         #
         db_activity = db.query(models.Activity).options(joinedload(models.Activity.children)).filter(models.Activity.id == id).first()
+        #
         return db_activity
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -82,6 +85,7 @@ def create_activity(
         db.add(db_activity)
         db.commit()
         db.refresh(db_activity)
+        #
         return db_activity
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -93,7 +97,7 @@ def update_activity(
     db: Session = Depends(get_db),
     api_key: str = Depends(security.get_api_key)
 ):
-    # update activity information
+    # checking for the activity
     db_activity = db.query(schemas.Activity).filter(schemas.Activity.id == id).first()
     if db_activity is None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"activity {id} not found")
@@ -104,6 +108,7 @@ def update_activity(
             raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = f"new parent activity not found")
         if new_parent.level >= 3:
             raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = f"cannot move to parent with level 3 or higher")
+    # update activity information
     try:
         db_activity = db.query(models.Activity).filter(models.Activity.id == id).first()
         if not db_activity:
@@ -113,6 +118,7 @@ def update_activity(
             setattr(db_activity, key, value)
         db.commit()
         db.refresh(db_activity)
+        #
         return db_activity
     except Exception as e:
             raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -129,6 +135,7 @@ def delete_activity(
             raise HTTPException(status_code = Status.HTTP_404_NOT_FOUND, detail = f"activity with ID {id} not found")
         db.delete(db_activity)
         db.commit()
+        #
         return None
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))

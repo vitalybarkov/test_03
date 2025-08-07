@@ -99,6 +99,7 @@ def create_organization(
         db.add(db_organization)
         db.commit()
         db.refresh(db_organization)
+        #
         return db_organization
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -164,6 +165,7 @@ def delete_organization(
             raise HTTPException(status_code = Status.HTTP_404_NOT_FOUND, detail = f"activity with ID {id} not found")
         db.delete(db_organizations)
         db.commit()
+        #
         return None
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -207,7 +209,7 @@ def remove_phone_from_organization(
     db: Session = Depends(get_db),
     api_key: str = Depends(security.get_api_key)
 ):
-    # validate imput
+    # validate input
     if not phone.number and not phone.organization_id:
         raise HTTPException(status_code = 404, detail = f"phone number or organization_id not entered")
     # looking for the phone number existence
@@ -296,6 +298,7 @@ def get_organizations_by_building_id(id: int, db: Session = Depends(get_db)):
         db_organizations = db.query(models.Organization).filter(models.Organization.building_id == id).all()
         if db_organizations is None:
             raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"organization {id} not found")
+        #
         return db_organizations
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -312,6 +315,7 @@ def get_organizations_by_activity_id(id: int, db: Session = Depends(get_db)):
             .all())
         if db_organizations is None:
             raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"no organizations found containing activity {id}")
+        #
         return db_organizations
     except Exception as e:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
@@ -336,7 +340,6 @@ def get_organizations_by_activity_tree(
         child_ids = [a.id for a in child_activities]        
         for child_id in child_ids:
             child_ids.extend(get_child_activity_ids(child_id, current_level + 1))
-
         return child_ids
     try:
         # check if main activity exists
